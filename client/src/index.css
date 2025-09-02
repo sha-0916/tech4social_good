@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* optional: keep full-height layout for your app */
+html, body, #root { height: 100%; }
