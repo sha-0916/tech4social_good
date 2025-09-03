@@ -4,8 +4,6 @@ export default function App() {
   const [videoOk, setVideoOk] = useState(true);
 
   const goNext = () => {
-    // For now, just a placeholder.
-    // Later this will navigate to the Onboarding screen (region + age).
     alert("Get Started → Onboarding (region + age)");
   };
 
@@ -36,17 +34,25 @@ export default function App() {
 
       {/* Foreground content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-white drop-shadow">
-          Your Choices. Your Climate.
-        </h1>
-        <p className="mt-3 max-w-xl text-white/90">
+        {/* App name + tagline */}
+        <div className="flex flex-col items-center">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 drop-shadow-lg">
+            ClimateLens
+          </h1>
+          <p className="mt-2 text-lg md:text-xl italic text-white/90">
+            Your Choices. Your Climate.
+          </p>
+        </div>
+
+        {/* Subtitle */}
+        <p className="mt-6 max-w-xl text-white/90 text-lg md:text-xl">
           See climate change in <span className="font-semibold">your region</span> and what you can do today.
         </p>
 
         {/* Auth card (mocked for now) */}
         <div className="mt-8 w-full max-w-sm rounded-2xl bg-white/90 p-5 shadow-2xl backdrop-blur">
           <button
-            className="w-full rounded-xl bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700 active:scale-95 transition"
+            className="w-full rounded-xl bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 px-4 py-3 font-semibold text-white hover:opacity-90 active:scale-95 transition"
             onClick={goNext}
           >
             Get Started
