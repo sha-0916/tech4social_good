@@ -3,10 +3,11 @@ import Header from "../components/Header";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
 
-// Local types to avoid any cross-file type dependency issues
+// Local types (keep self-contained)
 type AgeBand = "5-10" | "11-15" | "16-20";
 type City = { name: string; country: string };
 type AuthMode = "login" | "signup";
+type Stage = "intro" | "auth";
 
 const DEMO_CITIES: City[] = [
   { name: "Berlin", country: "Germany" },
@@ -32,8 +33,12 @@ const DEMO_CITIES: City[] = [
 ];
 
 export default function LandingPage() {
+  // background video fallback
   const [videoOk, setVideoOk] = useState(true);
-  const [mode, setMode] = useState<AuthMode>("login");
+
+  // stage + auth mode
+  const [stage, setStage] = useState<Stage>("intro");
+  const [mode, setMode] = useState<AuthMode>("signup");
 
   // login state
   const [loginEmail, setLoginEmail] = useState("");
@@ -49,7 +54,7 @@ export default function LandingPage() {
   const [country, setCountry] = useState("");
   const [signupError, setSignupError] = useState<string | null>(null);
 
-  // suggestions + auto-fill country
+  // city suggestions + auto-fill country
   const citySuggestions = useMemo(() => {
     if (!city.trim()) return DEMO_CITIES.slice(0, 8);
     const q = city.toLowerCase();
@@ -87,12 +92,23 @@ export default function LandingPage() {
 - Age group: ${ageBand}
 - City: ${city}
 - Country: ${country || "(detect later)"}`);
+    setStage("intro");
     setMode("login");
+  };
+
+  // intro → auth
+  const startSignup = () => {
+    setMode("signup");
+    setStage("auth");
+  };
+  const startLogin = () => {
+    setMode("login");
+    setStage("auth");
   };
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
-      {/* Background video / poster */}
+      {/* Background video or fallback image */}
       {videoOk ? (
         <video
           className="absolute inset-0 h-full w-full object-cover"
@@ -115,77 +131,120 @@ export default function LandingPage() {
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
 
-      {/* Foreground */}
-      <div className="relative z-10 h-full w-full overflow-y-auto px-4 sm:px-6">
-        <div className="mx-auto flex min-h-full max-w-2xl items-center">
-          <div className="w-full flex flex-col items-center gap-4 md:gap-6 py-8">
-            {/* Branding */}
-            <Header tagline="Your Choices. Your Climate." />
+      {/* Foreground content */}
+      {stage === "intro" ? (
+        // ⬇️ EXACT same structure / spacing as your pre-modularity App.tsx
+        <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
+          {/* App name + animated tagline */}
+          <Header tagline="Your Choices. Your Climate." />
 
-            {/* Toggle */}
-            <div className="w-full max-w-md">
-              <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
-                <button
-                  type="button"
-                  onClick={() => setMode("login")}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                    mode === "login" ? "bg-white shadow" : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  Log in
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("signup")}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                    mode === "signup" ? "bg-white shadow" : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  Sign up
-                </button>
-              </div>
+          {/* Subtitle */}
+          <p className="mt-6 max-w-xl text-white/90 text-lg md:text-xl">
+            See climate change in <span className="font-semibold">your region</span> and what you can do today.
+          </p>
+
+          {/* Auth card (intro version) */}
+          <div className="mt-8 w-full max-w-sm rounded-2xl bg-white/90 p-5 shadow-2xl backdrop-blur">
+            <button
+              className="w-full rounded-xl bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 px-4 py-3 font-semibold text-white hover:opacity-90 active:scale-95 transition"
+              onClick={startSignup}
+            >
+              Get Started
+            </button>
+            <div className="mt-3 text-sm text-gray-600">
+              Already have an account?{" "}
+              <button className="font-semibold text-green-700 hover:underline" onClick={startLogin}>
+                Log in
+              </button>
             </div>
-
-            {/* Auth card */}
-            <div className="w-full max-w-md rounded-2xl bg-white/95 p-6 shadow-2xl backdrop-blur text-left">
-              {mode === "login" ? (
-                <LoginForm
-                  onSubmit={handleLogin}
-                  error={loginError}
-                  email={loginEmail}
-                  setEmail={setLoginEmail}
-                  password={loginPassword}
-                  setPassword={setLoginPassword}
-                />
-              ) : (
-                <SignupForm
-                  onSubmit={handleSignup}
-                  error={signupError}
-                  username={username}
-                  setUsername={setUsername}
-                  email={signupEmail}
-                  setEmail={setSignupEmail}
-                  password={signupPassword}
-                  setPassword={setSignupPassword}
-                  ageBand={ageBand}
-                  setAgeBand={setAgeBand}
-                  city={city}
-                  setCity={setCity}
-                  country={country}
-                  setCountry={setCountry}
-                  suggestions={citySuggestions}
-                />
-              )}
-              <p className="mt-3 text-xs text-gray-500">
-                We don’t need real names. Your data stays on this device for the demo.
-              </p>
-            </div>
-
-            <div className="text-[11px] text-white/70 pt-2">© 2025 ClimateLens</div>
+            <p className="mt-3 text-xs text-gray-500">
+              No real names. You can change age later.
+            </p>
           </div>
         </div>
-      </div>
+      ) : (
+        // Auth stage: allow scrolling for tall signup form but keep tight cluster
+        <div className="relative z-10 h-full w-full overflow-y-auto px-4 sm:px-6 text-center">
+          <div className="mx-auto flex min-h-full max-w-2xl items-center">
+            <div className="w-full flex flex-col items-center gap-4 md:gap-6 py-8">
+              {/* Keep the same header at top */}
+              <Header tagline="Your Choices. Your Climate." />
 
+              {/* Toggle */}
+              <div className="w-full max-w-md">
+                <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setMode("login")}
+                    className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                      mode === "login" ? "bg-white shadow" : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Log in
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("signup")}
+                    className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                      mode === "signup" ? "bg-white shadow" : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    Sign up
+                  </button>
+                </div>
+              </div>
+
+              {/* Card with selected form */}
+              <div className="w-full max-w-md rounded-2xl bg-white/95 p-6 shadow-2xl backdrop-blur text-left animate-[fadeIn_.25s_ease]">
+                {mode === "login" ? (
+                  <LoginForm
+                    onSubmit={handleLogin}
+                    error={loginError}
+                    email={loginEmail}
+                    setEmail={setLoginEmail}
+                    password={loginPassword}
+                    setPassword={setLoginPassword}
+                  />
+                ) : (
+                  <SignupForm
+                    onSubmit={handleSignup}
+                    error={signupError}
+                    username={username}
+                    setUsername={setUsername}
+                    email={signupEmail}
+                    setEmail={setSignupEmail}
+                    password={signupPassword}
+                    setPassword={setSignupPassword}
+                    ageBand={ageBand}
+                    setAgeBand={setAgeBand}
+                    city={city}
+                    setCity={setCity}
+                    country={country}
+                    setCountry={setCountry}
+                    suggestions={citySuggestions}
+                  />
+                )}
+
+                {/* Back to intro */}
+                <div className="mt-3 text-sm text-gray-600 text-center">
+                  <button
+                    type="button"
+                    onClick={() => setStage("intro")}
+                    className="hover:underline"
+                    title="Back"
+                  >
+                    ← Back
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-[11px] text-white/70 pt-2">© 2025 ClimateLens</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Keyframes used in small fades */}
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
