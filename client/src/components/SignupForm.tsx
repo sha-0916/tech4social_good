@@ -1,3 +1,8 @@
+// Self-contained SignupForm to avoid type import cycles.
+// Uses internal union types for AgeBand and a local City shape.
+type AgeBand = "5-10" | "11-15" | "16-20";
+type City = { name: string; country: string };
+
 export default function SignupForm({
   onSubmit,
   error,
@@ -23,19 +28,19 @@ export default function SignupForm({
   setEmail: (s: string) => void;
   password: string;
   setPassword: (s: string) => void;
-  ageBand: "5-10" | "11-15" | "16-20";
-  setAgeBand: (a: "5-10" | "11-15" | "16-20") => void;
+  ageBand: AgeBand;
+  setAgeBand: (a: AgeBand) => void;
   city: string;
   setCity: (s: string) => void;
   country: string;
   setCountry: (s: string) => void;
-  suggestions: { name: string; country: string }[];
+  suggestions: City[] | undefined;
 }) {
-  const bands: Array<"5-10" | "11-15" | "16-20"> = ["5-10", "11-15", "16-20"];
+  const bands: AgeBand[] = ["5-10", "11-15", "16-20"];
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
+    <form onSubmit={onSubmit} className="space-y-3 animate-[fadeIn_.25s_ease]">
       <label className="block">
         <span className="text-sm font-semibold text-gray-800">Username</span>
         <input

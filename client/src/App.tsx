@@ -1,5 +1,11 @@
+import React from "react";
 import LandingPage from "./pages/LandingPage";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
-  return <LandingPage />;
+  return (
+    <ErrorBoundary>
+      <LandingPage />
+    </ErrorBoundary>
+  );
 }

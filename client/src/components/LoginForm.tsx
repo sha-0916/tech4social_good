@@ -14,7 +14,7 @@ export default function LoginForm({
   setPassword: (s: string) => void;
 }) {
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
+    <form onSubmit={onSubmit} className="space-y-3 animate-[fadeIn_.25s_ease]">
       <label className="block">
         <span className="text-sm font-semibold text-gray-800">Email</span>
         <input

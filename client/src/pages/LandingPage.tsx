@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import Header from "../components/Header";
-import AuthToggle, { AuthMode } from "../components/AuthToggle";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
-import { AgeBand } from "../components/AgeSelector";
-import { City } from "../components/CityAutocomplete";
+
+// Local types to avoid any cross-file type dependency issues
+type AgeBand = "5-10" | "11-15" | "16-20";
+type City = { name: string; country: string };
+type AuthMode = "login" | "signup";
 
 const DEMO_CITIES: City[] = [
   { name: "Berlin", country: "Germany" },
@@ -30,10 +32,7 @@ const DEMO_CITIES: City[] = [
 ];
 
 export default function LandingPage() {
-  // background video fallback
   const [videoOk, setVideoOk] = useState(true);
-
-  // auth mode
   const [mode, setMode] = useState<AuthMode>("login");
 
   // login state
@@ -116,18 +115,39 @@ export default function LandingPage() {
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
 
-      {/* Foreground (scrollable) */}
+      {/* Foreground */}
       <div className="relative z-10 h-full w-full overflow-y-auto px-4 sm:px-6">
-        {/* Center a compact column that contains BOTH header and card with tight gap */}
         <div className="mx-auto flex min-h-full max-w-2xl items-center">
           <div className="w-full flex flex-col items-center gap-4 md:gap-6 py-8">
-            {/* Header (smaller gap above by design) */}
+            {/* Branding */}
             <Header tagline="Your Choices. Your Climate." />
 
-            {/* Auth card (sits close to header, not floating far below) */}
-            <div className="w-full max-w-md rounded-2xl bg-white/95 p-6 shadow-2xl backdrop-blur text-left">
-              <AuthToggle mode={mode} onChange={setMode} />
+            {/* Toggle */}
+            <div className="w-full max-w-md">
+              <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
+                <button
+                  type="button"
+                  onClick={() => setMode("login")}
+                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                    mode === "login" ? "bg-white shadow" : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  Log in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("signup")}
+                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                    mode === "signup" ? "bg-white shadow" : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  Sign up
+                </button>
+              </div>
+            </div>
 
+            {/* Auth card */}
+            <div className="w-full max-w-md rounded-2xl bg-white/95 p-6 shadow-2xl backdrop-blur text-left">
               {mode === "login" ? (
                 <LoginForm
                   onSubmit={handleLogin}
@@ -156,19 +176,16 @@ export default function LandingPage() {
                   suggestions={citySuggestions}
                 />
               )}
-
               <p className="mt-3 text-xs text-gray-500">
                 We don’t need real names. Your data stays on this device for the demo.
               </p>
             </div>
 
-            {/* Optional small footer note, keeps balance at bottom */}
             <div className="text-[11px] text-white/70 pt-2">© 2025 ClimateLens</div>
           </div>
         </div>
       </div>
 
-      {/* Tiny keyframes for potential fade-in (used in forms) */}
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
