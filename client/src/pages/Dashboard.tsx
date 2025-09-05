@@ -2,6 +2,9 @@ import { useMemo, useState } from "react";
 import Header from "../components/Header";
 import SkyMood from "../components/tiles/SkyMood";
 
+// Solid, app-like dashboard (no video background).
+// Smaller logo at top-left, city selector at top-right, sticky footer.
+
 type CityData = {
   city: string;
   country: string;
@@ -91,7 +94,6 @@ const MOCK_CITIES: CityData[] = [
 ];
 
 export default function Dashboard() {
-  const [videoOk, setVideoOk] = useState(true);
   const [selectedCity, setSelectedCity] = useState<string>(MOCK_CITIES[0].city);
 
   const city = useMemo(
@@ -100,66 +102,52 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
-      {/* Background video / poster (reuse your login assets for now) */}
-      {videoOk ? (
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          src="/login_screen.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster="/login_screen_poster.png"
-          onError={() => setVideoOk(false)}
-        />
-      ) : (
-        <img
-          src="/login_screen_poster.png"
-          alt="Earth background"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      )}
-      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+    <div className="min-h-screen w-full bg-slate-50 flex flex-col">
+      {/* Top bar */}
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center justify-between">
+          {/* compact brand left */}
+          <Header compact showTagline={false} className="!mb-0" />
+          {/* city selector right */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-slate-700">City</label>
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {MOCK_CITIES.map((c) => (
+                <option key={c.city} value={c.city}>
+                  {c.city}, {c.country}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </header>
 
-      {/* Foreground */}
-      <div className="relative z-10 h-full w-full overflow-y-auto px-4 sm:px-6">
-        <div className="mx-auto flex min-h-full max-w-5xl flex-col py-6">
-          {/* Brand + simple top bar */}
-          <div className="flex items-center justify-between">
-            <Header tagline="Your Choices. Your Climate." />
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-white/90">City</label>
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="rounded-xl border border-white/30 bg-white/90 px-3 py-2 text-sm shadow"
-              >
-                {MOCK_CITIES.map((c) => (
-                  <option key={c.city} value={c.city}>
-                    {c.city}, {c.country}
-                  </option>
-                ))}
-              </select>
-            </div>
+      {/* Main content */}
+      <main className="flex-1">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
+          {/* Greeting / context line (optional) */}
+          <div className="mb-4 text-slate-700">
+            <span className="font-semibold">{city.city}</span> snapshot
           </div>
 
           {/* Tiles grid */}
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <SkyMood aqi={city.aqi} />
-            {/* We will add the other tiles (2–6) here, one by one */}
+            {/* TODO: add Tree Buddy, Water Droplet, Thermometer, Coastline Shield, Action Streak */}
           </div>
-
-          <div className="mt-4 text-xs text-white/70">© 2025 ClimateLens</div>
         </div>
-      </div>
+      </main>
 
-      {/* Keyframes for subtle animations used by SkyMood */}
-      <style>{`
-        @keyframes float { 0% { transform: translateY(0px) } 50% { transform: translateY(-4px) } 100% { transform: translateY(0px) } }
-        @keyframes puff  { 0% { transform: scale(0.9); opacity: 0.9 } 60% { transform: scale(1.5); opacity: 0.35 } 100% { transform: scale(1.8); opacity: 0 } }
-        @keyframes spin  { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
-      `}</style>
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-3 text-center text-xs text-slate-500">
+          © 2025 ClimateLens
+        </div>
+      </footer>
     </div>
   );
 }
