@@ -32,7 +32,13 @@ const DEMO_CITIES: City[] = [
   { name: "Seoul", country: "South Korea" },
 ];
 
-export default function LandingPage() {
+export default function LandingPage({
+  onLoginSuccess,
+  onSignupSuccess,
+}: {
+  onLoginSuccess?: (profile: { username: string; city: string; ageBand?: AgeBand }) => void;
+  onSignupSuccess?: (profile: { username: string; city: string; ageBand?: AgeBand }) => void;
+}) {
   // background video fallback
   const [videoOk, setVideoOk] = useState(true);
 
@@ -54,7 +60,7 @@ export default function LandingPage() {
   const [country, setCountry] = useState("");
   const [signupError, setSignupError] = useState<string | null>(null);
 
-  // city suggestions + auto-fill country
+  // suggestions + auto-fill country
   const citySuggestions = useMemo(() => {
     if (!city.trim()) return DEMO_CITIES.slice(0, 8);
     const q = city.toLowerCase();
@@ -76,7 +82,13 @@ export default function LandingPage() {
     setLoginError(null);
     if (!isEmail(loginEmail)) return setLoginError("Please enter a valid email address.");
     if (!strongEnough(loginPassword)) return setLoginError("Password must be at least 6 characters.");
-    alert("Login successful (mock). Next: show dashboard for your region.");
+
+    // ✅ Navigate to dashboard (mock profile)
+    onLoginSuccess?.({
+      username: loginEmail.split("@")[0] || "user",
+      city: city || "Berlin",
+      ageBand: "11-15",
+    });
   };
 
   const handleSignup = (e: React.FormEvent) => {
@@ -86,14 +98,13 @@ export default function LandingPage() {
     if (!isEmail(signupEmail)) return setSignupError("Please enter a valid email address.");
     if (!strongEnough(signupPassword)) return setSignupError("Password must be at least 6 characters.");
     if (!city.trim()) return setSignupError("Please enter your city.");
-    alert(`Signup successful (mock):
-- Username: ${username}
-- Email: ${signupEmail}
-- Age group: ${ageBand}
-- City: ${city}
-- Country: ${country || "(detect later)"}`);
-    setStage("intro");
-    setMode("login");
+
+    // ✅ Navigate to dashboard with collected profile
+    onSignupSuccess?.({
+      username,
+      city,
+      ageBand,
+    });
   };
 
   // intro → auth
@@ -133,7 +144,6 @@ export default function LandingPage() {
 
       {/* Foreground content */}
       {stage === "intro" ? (
-        // ⬇️ EXACT same structure / spacing as your pre-modularity App.tsx
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
           {/* App name + animated tagline */}
           <Header tagline="Your Choices. Your Climate." />
@@ -157,9 +167,7 @@ export default function LandingPage() {
                 Log in
               </button>
             </div>
-            <p className="mt-3 text-xs text-gray-500">
-              No real names. You can change age later.
-            </p>
+            <p className="mt-3 text-xs text-gray-500">No real names. You can change age later.</p>
           </div>
         </div>
       ) : (
@@ -227,12 +235,7 @@ export default function LandingPage() {
 
                 {/* Back to intro */}
                 <div className="mt-3 text-sm text-gray-600 text-center">
-                  <button
-                    type="button"
-                    onClick={() => setStage("intro")}
-                    className="hover:underline"
-                    title="Back"
-                  >
+                  <button type="button" onClick={() => setStage("intro")} className="hover:underline" title="Back">
                     ← Back
                   </button>
                 </div>
