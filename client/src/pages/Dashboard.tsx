@@ -2,6 +2,7 @@ import AppShell from "../components/AppShell";
 import SkyMood from "../components/tiles/SkyMood";
 import TreeBuddy from "../components/tiles/TreeBuddy";
 import WaterDroplet from "../components/tiles/WaterDroplet";
+import Thermometer from "../components/tiles/Thermometer";
 
 type CityData = {
   city: string;
@@ -46,19 +47,14 @@ export default function Dashboard({ user }: { user?: UserProfile }) {
 
       {/* Tiles grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="cl-card cl-card-pad hover-lift">
-          <SkyMood aqi={city.aqi} />
-        </div>
-        <div className="cl-card cl-card-pad hover-lift">
-          <TreeBuddy renewablesPct={city.renewablesPct} />
-        </div>
-        <div className="cl-card cl-card-pad hover-lift">
-          <WaterDroplet stress={city.waterStress} />
-        </div>
-        {/* Tiles 4–6 will be added below later */}
+        <div className="cl-card cl-card-pad hover-lift"><SkyMood aqi={city.aqi} /></div>
+        <div className="cl-card cl-card-pad hover-lift"><TreeBuddy renewablesPct={city.renewablesPct} /></div>
+        <div className="cl-card cl-card-pad hover-lift"><WaterDroplet stress={city.waterStress} /></div>
+        <div className="cl-card cl-card-pad hover-lift"><Thermometer tempAnomaly={city.tempAnomaly} /></div>
+        {/* Tiles 5–6 will go here */}
       </div>
 
-      {/* Keyframes used by tiles */}
+      {/* Keyframes */}
       <style>{`
         @keyframes float   { 0% { transform: translateY(0px) } 50% { transform: translateY(-4px) } 100% { transform: translateY(0px) } }
         @keyframes puff    { 0% { transform: scale(0.9); opacity: 0.9 } 60% { transform: scale(1.5); opacity: 0.35 } 100% { transform: scale(1.8); opacity: 0 } }
@@ -67,6 +63,7 @@ export default function Dashboard({ user }: { user?: UserProfile }) {
         @keyframes blink   { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } }
         @keyframes ripple  { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
         @keyframes rise    { 0% { transform: translate(-50%, 0); opacity: .0 } 40% { opacity: .8 } 100% { transform: translate(-50%, -120px); opacity: 0 } }
+        @keyframes shimmer { 0%,100% { backdrop-filter: blur(0px) brightness(1) } 50% { backdrop-filter: blur(1.2px) brightness(1.05) } }
       `}</style>
     </AppShell>
   );
