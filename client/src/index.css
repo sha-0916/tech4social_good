@@ -1,64 +1,36 @@
 @import "tailwindcss";
 
-/* === Design tokens (CSS vars) === */
-:root {
-  --cl-bg: #f8fafc;           /* slate-50 */
-  --cl-text: #0f172a;         /* slate-900 */
-  --cl-text-muted: #475569;   /* slate-600/700 */
-  --cl-surface: rgba(255,255,255,0.95);
-
-  --cl-grad-from: #22c55e;    /* emerald-500 */
-  --cl-grad-via:  #3b82f6;    /* sky-500 */
-  --cl-grad-to:   #7c3aed;    /* violet-600 */
-
-  --cl-ring: #3b82f6;
+/* === Design tokens === */
+:root{
+  --cl-bg-start:#f8fafc;   /* slate-50 */
+  --cl-bg-end:#eef2f7;     /* slightly darker base */
+  --cl-text:#0f172a;       /* slate-900 */
+  --cl-surface:rgba(255,255,255,0.95);
+  --cl-grad-from:#22c55e;  /* emerald-500 */
+  --cl-grad-via:#3b82f6;   /* sky-500 */
+  --cl-grad-to:#7c3aed;    /* violet-600 */
+  --cl-ring:#3b82f6;
 }
 
-/* Global base */
-html, body, #root { height: 100%; }
-body { background: var(--cl-bg); color: var(--cl-text); }
-
-/* === Subtle aurora background (only when .fun-bg is present) === */
-.fun-bg { position: relative; isolation: isolate; }
-.fun-bg::before {
-  content: "";
-  position: fixed; inset: -10%;
-  z-index: -1;
-  background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(34,197,94,0.12), transparent 70%),
-    radial-gradient(900px 500px at 100% 0%, rgba(59,130,246,0.10), transparent 70%),
-    radial-gradient(900px 500px at 0% 100%, rgba(124,58,237,0.10), transparent 70%);
-  filter: blur(8px);
-  pointer-events: none;
+html,body,#root{height:100%}
+body{
+  /* subtle fallback gradient so it never looks plain white */
+  background: linear-gradient(180deg,var(--cl-bg-start) 0%, var(--cl-bg-end) 100%);
+  color:var(--cl-text);
 }
 
-/* === Reusable shells === */
-.cl-card { border-radius: 1rem; background: var(--cl-surface); backdrop-filter: blur(8px); box-shadow: 0 12px 30px rgba(2,6,23,0.08); }
-.cl-card-pad { padding: 1rem; }
-@media (min-width: 640px) { .cl-card-pad { padding: 1.5rem; } }
+/* Card + controls (reusable helpers) */
+.cl-card{border-radius:1rem;background:var(--cl-surface);backdrop-filter:blur(8px);box-shadow:0 12px 30px rgba(2,6,23,.08)}
+.cl-card-pad{padding:1rem}
+@media(min-width:640px){.cl-card-pad{padding:1.5rem}}
 
-.cl-btn {
-  border-radius: 0.75rem; font-weight: 700;
-  padding: 0.75rem 1rem;
-  transition: all 200ms ease-out;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-.cl-btn:active { transform: scale(0.98); }
+.cl-btn{border-radius:.75rem;font-weight:700;padding:.75rem 1rem;transition:all .2s ease-out;display:inline-flex;align-items:center;justify-content:center}
+.cl-btn:active{transform:scale(.98)}
+.cl-btn-primary{background-image:linear-gradient(90deg,var(--cl-grad-from),var(--cl-grad-via),var(--cl-grad-to));color:#fff;box-shadow:0 10px 18px rgba(59,130,246,.25)}
+.cl-btn-primary:hover{filter:brightness(1.05)}
 
-.cl-btn-primary {
-  background-image: linear-gradient(90deg, var(--cl-grad-from), var(--cl-grad-via), var(--cl-grad-to));
-  color: white;
-  box-shadow: 0 10px 18px rgba(59,130,246,0.25);
-}
-.cl-btn-primary:hover { filter: brightness(1.05); }
+.cl-input{border-radius:.75rem;border:1px solid rgba(15,23,42,.15);padding:.6rem .8rem;width:100%;background:#fff}
+.cl-input:focus{outline:none;box-shadow:0 0 0 2px var(--cl-ring)}
 
-.cl-input {
-  border-radius: 0.75rem; border: 1px solid rgba(15,23,42,0.15);
-  padding: 0.6rem 0.8rem; width: 100%;
-  background: white;
-}
-.cl-input:focus { outline: none; box-shadow: 0 0 0 2px var(--cl-ring); }
-
-/* Hover lift */
-.hover-lift { transition: transform 200ms ease, box-shadow 200ms ease; }
-.hover-lift:hover { transform: translateY(-1px); box-shadow: 0 16px 28px rgba(2,6,23,0.12); }
+.hover-lift{transition:transform .2s ease,box-shadow .2s ease}
+.hover-lift:hover{transform:translateY(-1px);box-shadow:0 16px 28px rgba(2,6,23,.12)}
