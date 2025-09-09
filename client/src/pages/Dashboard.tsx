@@ -42,12 +42,12 @@ export default function Dashboard({ user }: { user?: UserProfile }) {
   return (
     <AppShell username={safeUser.username}>
       {/* Page header */}
-      <div className="mb-4 text-slate-700">
+      <div className="mb-3 md:mb-4 text-slate-700">
         <span className="font-semibold">{city.city}</span> snapshot
         {city.country ? <span className="text-slate-500"> — {city.country}</span> : null}
       </div>
 
-      {/* Tiles grid */}
+      {/* Responsive grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="cl-card cl-card-pad hover-lift"><SkyMood aqi={city.aqi} /></div>
         <div className="cl-card cl-card-pad hover-lift"><TreeBuddy renewablesPct={city.renewablesPct} /></div>
@@ -56,12 +56,10 @@ export default function Dashboard({ user }: { user?: UserProfile }) {
         <div className="cl-card cl-card-pad hover-lift">
           <CoastlineShield isCoastal={city.isCoastal} risk={city.seaLevelRiskPct} />
         </div>
-        <div className="cl-card cl-card-pad hover-lift">
-          <ActionStreak days={city.streakDays} />
-        </div>
+        <div className="cl-card cl-card-pad hover-lift"><ActionStreak days={city.streakDays} /></div>
       </div>
 
-      {/* Keyframes used by tiles */}
+      {/* Keyframes */}
       <style>{`
         @keyframes float     { 0% { transform: translateY(0px) } 50% { transform: translateY(-4px) } 100% { transform: translateY(0px) } }
         @keyframes puff      { 0% { transform: scale(0.9); opacity: 0.9 } 60% { transform: scale(1.5); opacity: 0.35 } 100% { transform: scale(1.8); opacity: 0 } }
