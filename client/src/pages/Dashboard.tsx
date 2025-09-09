@@ -1,6 +1,7 @@
 import AppShell from "../components/AppShell";
 import SkyMood from "../components/tiles/SkyMood";
 import TreeBuddy from "../components/tiles/TreeBuddy";
+import WaterDroplet from "../components/tiles/WaterDroplet";
 
 type CityData = {
   city: string;
@@ -37,8 +38,7 @@ export default function Dashboard({ user }: { user?: UserProfile }) {
 
   return (
     <AppShell username={safeUser.username}>
-      {/* Page header / breadcrumb area */}
-
+      {/* Page header */}
       <div className="mb-4 text-slate-700">
         <span className="font-semibold">{city.city}</span> snapshot
         {city.country ? <span className="text-slate-500"> — {city.country}</span> : null}
@@ -52,16 +52,21 @@ export default function Dashboard({ user }: { user?: UserProfile }) {
         <div className="cl-card cl-card-pad hover-lift">
           <TreeBuddy renewablesPct={city.renewablesPct} />
         </div>
-        {/* Tiles 3–6 will go here */}
+        <div className="cl-card cl-card-pad hover-lift">
+          <WaterDroplet stress={city.waterStress} />
+        </div>
+        {/* Tiles 4–6 will be added below later */}
       </div>
 
       {/* Keyframes used by tiles */}
       <style>{`
-        @keyframes float { 0% { transform: translateY(0px) } 50% { transform: translateY(-4px) } 100% { transform: translateY(0px) } }
-        @keyframes puff  { 0% { transform: scale(0.9); opacity: 0.9 } 60% { transform: scale(1.5); opacity: 0.35 } 100% { transform: scale(1.8); opacity: 0 } }
-        @keyframes spin  { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
-        @keyframes sway  { 0% { transform: rotate(0deg) } 50% { transform: rotate(2.3deg) } 100% { transform: rotate(0deg) } }
-        @keyframes blink { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } }
+        @keyframes float   { 0% { transform: translateY(0px) } 50% { transform: translateY(-4px) } 100% { transform: translateY(0px) } }
+        @keyframes puff    { 0% { transform: scale(0.9); opacity: 0.9 } 60% { transform: scale(1.5); opacity: 0.35 } 100% { transform: scale(1.8); opacity: 0 } }
+        @keyframes spin    { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+        @keyframes sway    { 0% { transform: rotate(0deg) } 50% { transform: rotate(2.3deg) } 100% { transform: rotate(0deg) } }
+        @keyframes blink   { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } }
+        @keyframes ripple  { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+        @keyframes rise    { 0% { transform: translate(-50%, 0); opacity: .0 } 40% { opacity: .8 } 100% { transform: translate(-50%, -120px); opacity: 0 } }
       `}</style>
     </AppShell>
   );
