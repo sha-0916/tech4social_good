@@ -1,14 +1,30 @@
 import { useEffect, useState } from "react";
 import Hub from "./Hub";
+import AuthToggle from "./components/AuthToggle";
+import type { AuthMode } from "./components/AuthToggle";
+import LoginForm from "./components/LoginForm";
+import SignupForm from "./components/SignupForm";
 
 export default function App() {
   const [videoOk, setVideoOk] = useState(true);
   const [goApp, setGoApp] = useState(false);
 
-  // Typing effect
+  // show forms or not
+  const [showAuth, setShowAuth] = useState(false);
+  const [mode, setMode] = useState<AuthMode>("login");
+
+  // form states
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [ageBand, setAgeBand] = useState<"5-10" | "11-15" | "16-20">("11-15");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  // typing effect
   const tagline = "Your Choices. Your Climate.";
   const [displayedText, setDisplayedText] = useState("");
-
   useEffect(() => {
     let i = 0;
     const interval = setInterval(() => {
@@ -19,19 +35,38 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // handlers
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Email and password required");
+      return;
+    }
+    console.log("Login success", { email, password });
+    setGoApp(true);
+  };
+
+  const handleSignup = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username || !email || !password || !city) {
+      setError("All fields required");
+      return;
+    }
+    console.log("Signup success", { username, email, ageBand, city, country });
+    setGoApp(true);
+  };
+
+  // after login/signup → Hub
   if (goApp) {
-    // Enter the tabbed app
-    return <Hub username="guest" />;
+    return <Hub username={username || "guest"} />;
   }
 
-  const goNext = () => setGoApp(true);
-
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
-      {/* Background video or fallback image */}
+    <div className="relative min-h-screen w-full overflow-auto">
+      {/* Background */}
       {videoOk ? (
         <video
-          className="absolute inset-0 h-full w-full object-cover"
+          className="fixed inset-0 h-full w-full object-cover -z-10"
           src="/login_screen.mp4"
           autoPlay
           loop
@@ -44,26 +79,21 @@ export default function App() {
         <img
           src="/login_screen_poster.png"
           alt="Earth background"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="fixed inset-0 h-full w-full object-cover -z-10"
         />
       )}
+      <div className="fixed inset-0 bg-black/50 -z-10" aria-hidden="true" />
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+      {/* Foreground */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center py-12">
+        {/* Logo + tagline */}
+        <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 drop-shadow-lg">
+          ClimateLens
+        </h1>
+        <p className="mt-2 text-lg md:text-xl italic text-white/90 min-h-[1.5em]">
+          {displayedText}
+        </p>
 
-      {/* Foreground content */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-        {/* App name + animated tagline */}
-        <div className="flex flex-col items-center">
-          <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 drop-shadow-lg">
-            ClimateLens
-          </h1>
-          <p className="mt-2 text-lg md:text-xl italic text-white/90 min-h-[1.5em]">
-            {displayedText}
-          </p>
-        </div>
-
-        {/* Subtitle */}
         <p className="mt-6 max-w-xl text-white/90 text-lg md:text-xl">
           See climate change in{" "}
           <span className="font-semibold">your region</span> and what you can do today.
@@ -71,24 +101,78 @@ export default function App() {
 
         {/* Auth card */}
         <div className="mt-8 w-full max-w-sm rounded-2xl bg-white/90 p-5 shadow-2xl backdrop-blur">
-          <button
-            className="w-full rounded-xl bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 px-4 py-3 font-semibold text-white hover:opacity-90 active:scale-95 transition"
-            onClick={goNext}
-          >
-            Get Started
-          </button>
-          <div className="mt-3 text-sm text-gray-600">
-            Already have an account?{" "}
-            <button
-              className="font-semibold text-green-700 hover:underline"
-              onClick={goNext}
-            >
-              Log in
-            </button>
-          </div>
-          <p className="mt-3 text-xs text-gray-500">
-            No real names. You can change age later.
-          </p>
+          {!showAuth ? (
+            <>
+              <button
+                className="w-full rounded-xl bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 px-4 py-3 font-semibold text-white hover:opacity-90 active:scale-95 transition"
+                onClick={() => {
+                  setMode("signup");
+                  setShowAuth(true);
+                }}
+              >
+                Get Started
+              </button>
+              <div className="mt-3 text-sm text-gray-600">
+                Already have an account?{" "}
+                <button
+                  className="font-semibold text-green-700 hover:underline"
+                  onClick={() => {
+                    setMode("login");
+                    setShowAuth(true);
+                  }}
+                >
+                  Log in
+                </button>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                No real names. You can change age later.
+              </p>
+            </>
+          ) : (
+            <>
+              <AuthToggle mode={mode} onChange={setMode} />
+              {mode === "login" ? (
+                <LoginForm
+                  onSubmit={handleLogin}
+                  error={error}
+                  email={email}
+                  setEmail={setEmail}
+                  password={password}
+                  setPassword={setPassword}
+                />
+              ) : (
+                <SignupForm
+                  onSubmit={handleSignup}
+                  error={error}
+                  username={username}
+                  setUsername={setUsername}
+                  email={email}
+                  setEmail={setEmail}
+                  password={password}
+                  setPassword={setPassword}
+                  ageBand={ageBand}
+                  setAgeBand={setAgeBand}
+                  city={city}
+                  setCity={setCity}
+                  country={country}
+                  setCountry={setCountry}
+                  suggestions={[
+                    { name: "Berlin", country: "Germany" },
+                    { name: "Paris", country: "France" },
+                    { name: "New York", country: "United States" },
+                    { name: "Delhi", country: "India" },
+                    { name: "Nairobi", country: "Kenya" },
+                  ]}
+                />
+              )}
+              <button
+                className="mt-4 text-sm text-gray-600 underline hover:text-gray-900 transition"
+                onClick={() => setShowAuth(false)}
+              >
+                ← Back
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
