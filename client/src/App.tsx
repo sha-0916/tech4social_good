@@ -1,19 +1,21 @@
+// src/App.tsx
 import { useEffect, useState } from "react";
 import Hub from "./Hub";
 import AuthToggle from "./components/AuthToggle";
 import type { AuthMode } from "./components/AuthToggle";
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
+import { saveUser, validateLogin, emailExists } from "./utils/auth";
 
 export default function App() {
   const [videoOk, setVideoOk] = useState(true);
   const [goApp, setGoApp] = useState(false);
 
-  // show forms or not
+  // UI control
   const [showAuth, setShowAuth] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
 
-  // form states
+  // Form states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -22,7 +24,7 @@ export default function App() {
   const [country, setCountry] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // typing effect
+  // Typing effect
   const tagline = "Your Choices. Your Climate.";
   const [displayedText, setDisplayedText] = useState("");
   useEffect(() => {
@@ -35,35 +37,64 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // handlers
+  // --- LOGIN HANDLER ---
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Email and password required");
       return;
     }
-    console.log("Login success", { email, password });
-    setGoApp(true);
+
+    const user = validateLogin(email, password);
+    if (user) {
+      console.log("Login success:", user);
+      setUsername(user.username);
+      setCity(user.city);
+      setCountry(user.country || "");
+      setAgeBand(user.ageBand || "11-15");
+      setGoApp(true);
+    } else {
+      setError("Invalid email or password");
+    }
   };
 
+  // --- SIGNUP HANDLER ---
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !email || !password || !city) {
       setError("All fields required");
       return;
     }
-    console.log("Signup success", { username, email, ageBand, city, country });
+
+    if (emailExists(email)) {
+      setError("This email is already registered");
+      return;
+    }
+
+    const newUser = { username, email, password, city, country, ageBand };
+    saveUser(newUser);
+    console.log("Signup success:", newUser);
     setGoApp(true);
   };
 
-  // after login/signup → Hub
+  // If logged in → Dashboard
   if (goApp) {
-    return <Hub username={username || "guest"} />;
-  }
+  const handleLogout = () => {
+    // Clear current session and return to landing screen
+    setGoApp(false);
+    setShowAuth(false);
+    setEmail("");
+    setPassword("");
+    setUsername("");
+    setError(null);
+  };
+
+  return <Hub username={username || "guest"} onLogout={handleLogout} />;
+}
 
   return (
     <div className="relative min-h-screen w-full overflow-auto">
-      {/* Background */}
+      {/* Background video */}
       {videoOk ? (
         <video
           className="fixed inset-0 h-full w-full object-cover -z-10"
