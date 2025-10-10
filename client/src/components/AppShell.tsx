@@ -1,5 +1,6 @@
 // src/components/AppShell.tsx
 import { useState } from "react";
+import { Leaf, Circle } from "lucide-react"; // uses lucide-react icons
 
 interface AppShellProps {
   username: string;
@@ -14,9 +15,22 @@ export default function AppShell({ username, onLogout, children }: AppShellProps
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 to-slate-100 text-slate-800">
       {/* --- Top Navbar --- */}
       <header className="flex justify-between items-center px-6 py-3 shadow-sm bg-white/70 backdrop-blur sticky top-0 z-20">
-        <h1 className="text-2xl font-extrabold bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 text-transparent bg-clip-text drop-shadow-sm">
-          ClimateLens
-        </h1>
+        {/* --- Logo + App Name --- */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex items-center justify-center">
+            {/* Lens circle */}
+            <Circle size={26} className="text-green-500" strokeWidth={2.5} />
+            {/* Leaf accent */}
+            <Leaf
+              size={16}
+              className="absolute -right-2 top-1 text-emerald-500 rotate-[15deg]"
+              strokeWidth={2.5}
+            />
+          </div>
+          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-green-500 via-blue-500 to-purple-600 text-transparent bg-clip-text drop-shadow-sm">
+            ClimateLens
+          </h1>
+        </div>
 
         {/* User Menu */}
         <div className="relative">
